@@ -1,0 +1,9 @@
+Metadata-Version: 2.1
+Name: rlcrazyflie
+Version: 0.0.0
+Summary: TODO: Package description
+Maintainer: fausto
+Maintainer-email: piratax007@protonmail.ch
+License: MIT
+License-File: LICENSE
+Requires-Dist: setuptools

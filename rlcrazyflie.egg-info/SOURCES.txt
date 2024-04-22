@@ -1,0 +1,17 @@
+LICENSE
+package.xml
+setup.cfg
+setup.py
+resource/rlcrazyflie
+rlcrazyflie/__init__.py
+rlcrazyflie/control.py
+rlcrazyflie.egg-info/PKG-INFO
+rlcrazyflie.egg-info/SOURCES.txt
+rlcrazyflie.egg-info/dependency_links.txt
+rlcrazyflie.egg-info/entry_points.txt
+rlcrazyflie.egg-info/requires.txt
+rlcrazyflie.egg-info/top_level.txt
+rlcrazyflie.egg-info/zip-safe
+test/test_copyright.py
+test/test_flake8.py
+test/test_pep257.py
