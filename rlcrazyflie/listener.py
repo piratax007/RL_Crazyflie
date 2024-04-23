@@ -3,7 +3,7 @@ from rclpy.node import Node
 from geometry_msgs.msg import TransformStamped
 from tf2_msgs.msg import TFMessage
 from nav_msgs.msg import Odometry
-from CrazyflieAPI import drone
+from CrazyflieAPI import crazyflie
 
 TOPIC1 = "/tf"
 TOPIC2 = "/vicon/fausto_crazyfly/fausto_crazyfly"
@@ -28,13 +28,11 @@ class MySubscriber(Node):
             TOPIC3,  # Change 'topic3' to the name of the third topic you want to subscribe to
             self.listener_callback,
             10)
-        # Add more
-        self.drone = drone
-        # at some point I need to call self.drone.control.state = blah in order to update the observation space
 
-        self.tf = None 	
+        self.tf = None
         self.tf_stamped = None  # position
         self.odom = None  # linear and angular velocities
+        self.crazyflie = crazyflie
 
     def listener_callback(self, msg):
         if isinstance(msg, TFMessage):
@@ -76,8 +74,7 @@ class MySubscriber(Node):
             self.odom = msg
             
         if self.tf is not None and self.odom is not None and self.tf_stamped is not None:
-            # Do RL stuff
-            pass
+            self.crazyflie.control.observation_space = None
 
 
 def main(args=None):
