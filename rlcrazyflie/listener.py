@@ -3,13 +3,12 @@ from rclpy.node import Node
 from geometry_msgs.msg import TransformStamped
 from tf2_msgs.msg import TFMessage
 from nav_msgs.msg import Odometry
-
-# ADD RL PAKCAGE HERE 1
-# from fausto_package.rl_part import RlClass
+from CrazyflieAPI import drone
 
 TOPIC1 = "/tf"
 TOPIC2 = "/vicon/fausto_crazyfly/fausto_crazyfly"
 TOPIC3 = "/vicon/fausto_crazyfly/fausto_crazyfly/odom"
+
 
 class MySubscriber(Node):
     def __init__(self):
@@ -26,15 +25,16 @@ class MySubscriber(Node):
             10)
         self.subscription3 = self.create_subscription(
             Odometry,
-            TOPIC3,  # Change 'topic2' to the name of the second topic you want to subscribe to
+            TOPIC3,  # Change 'topic3' to the name of the third topic you want to subscribe to
             self.listener_callback,
             10)
         # Add more
-        #self.rl = RlClass() 
+        self.drone = drone
+        # at some point I need to call self.drone.control.state = blah in order to update the observation space
 
         self.tf = None 	
         self.tf_stamped = None  # position
-        self.odom = None	# linear and angular velocities
+        self.odom = None  # linear and angular velocities
 
     def listener_callback(self, msg):
         if isinstance(msg, TFMessage):
@@ -57,7 +57,7 @@ class MySubscriber(Node):
                     transform_matrix.rotation.z,
                     transform_matrix.rotation.w))
                 
-                self.tf =msg 
+                self.tf = msg
                 
         elif isinstance(msg, TransformStamped):
             # Handle TransformStamped
