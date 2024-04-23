@@ -23,9 +23,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'control = rlcrazyflie.control:main', 
             'listener = rlcrazyflie.listener:main'
-            # 'new_script = ' + rl_package + '.new_script:main'
+            'fly = rlcrazyflie.fly:main'
         ],
     },
 )
