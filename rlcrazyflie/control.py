@@ -28,7 +28,7 @@ class RLControlForCrazyflie:
         return tuple(map(lambda rpm: (rpm-4070.3)/0.2685, self.calculated_rpm[0, :]))
 
     @staticmethod
-    def _get_policy(policy_path: str) -> PPO.policy:
+    def _get_policy(policy_path: str):
         if os.path.isfile(policy_path + '/best_model.zip'):
             return PPO.load(policy_path + '/best_model.zip')
 
