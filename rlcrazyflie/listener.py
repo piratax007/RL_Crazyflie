@@ -3,7 +3,7 @@ from rclpy.node import Node
 from geometry_msgs.msg import TransformStamped
 from tf2_msgs.msg import TFMessage
 from nav_msgs.msg import Odometry
-from CrazyflieAPI import crazyflie
+from rlcrazyflie.CrazyflieAPI import crazyflie
 
 TOPIC1 = "/tf"
 TOPIC2 = "/vicon/fausto_crazyfly/fausto_crazyfly"
@@ -71,6 +71,19 @@ class MySubscriber(Node):
             self.tf_stamped = msg
             
         elif isinstance(msg, Odometry):
+            position = msg.pose.pose.position
+            orientation = msg.pose.pose.orientation
+            linear_velocities = msg.twist.twist.linear
+            angular_velocities = msg.twist.twist.angular
+
+            print(f"""
+            ####### ODOMETRY INFORMATION ##########
+            POSITION {position}
+            ORIENTATATION {orientation}
+            VELOCITY {linear_velocities}
+            ANGULAR VELOCITY {angular_velocities}
+            """)
+
             self.odom = msg
             
         if self.tf is not None and self.odom is not None and self.tf_stamped is not None:

@@ -1,6 +1,6 @@
 from crazyflie_py import Crazyswarm
 import numpy as np
-from control import RLControlForCrazyflie
+from rlcrazyflie.control import RLControlForCrazyflie
 
 
 class _CrazyflieAPI:
@@ -16,7 +16,7 @@ class _CrazyflieAPI:
     @staticmethod
     def _get_drone(crazyflie_id: int):
         swarm = Crazyswarm()
-        return swarm.dron.drones[crazyflie_id]
+        return swarm.allcfs.crazyflies[crazyflie_id]
 
 
 crazyflie = _CrazyflieAPI()

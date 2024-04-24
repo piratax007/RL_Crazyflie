@@ -3,8 +3,6 @@ from setuptools import find_packages, setup
 package_name = 'rlcrazyflie'
 rl_package = 'fausto_package'
 
-
-
 setup(
     name=package_name,
     version='0.0.0',
