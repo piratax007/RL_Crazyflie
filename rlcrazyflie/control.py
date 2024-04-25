@@ -6,7 +6,7 @@ from stable_baselines3 import PPO
 class RLControlForCrazyflie:
     def __init__(
             self,
-            policy_path=os.path.dirname('../assets/'),
+            policy_path=os.path.dirname('/home/fausto/ros2_ws/src/rlcrazyflie/assets/'),
             hover_rpm=14468.42,
             initial_state=np.zeros((1, 12))
     ):
