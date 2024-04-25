@@ -37,44 +37,44 @@ class MySubscriber(Node):
     def listener_callback(self, msg):
         if isinstance(msg, TFMessage):
             # Handle TFMessage
-            for transform in msg.transforms:
+            # for transform in msg.transforms:
                 # Access transform data as needed
-                child_frame_id = transform.child_frame_id
-                transform_matrix = transform.transform
+                # child_frame_id = transform.child_frame_id
+                # transform_matrix = transform.transform
                 # Print transform data for demonstration
-                print("Received TF Message:")
-                print("Child Frame ID:", child_frame_id)
-                print("Transform Matrix:")
-                print("  Translation: [x={}, y={}, z={}]".format(
-                    transform_matrix.translation.x,
-                    transform_matrix.translation.y,
-                    transform_matrix.translation.z))
-                print("  Rotation: [x={}, y={}, z={}, w={}]".format(
-                    transform_matrix.rotation.x,
-                    transform_matrix.rotation.y,
-                    transform_matrix.rotation.z,
-                    transform_matrix.rotation.w))
+                # print("Received TF Message:")
+                # print("Child Frame ID:", child_frame_id)
+                # print("Transform Matrix:")
+                # print("  Translation: [x={}, y={}, z={}]".format(
+                #     transform_matrix.translation.x,
+                #     transform_matrix.translation.y,
+                #     transform_matrix.translation.z))
+                # print("  Rotation: [x={}, y={}, z={}, w={}]".format(
+                #     transform_matrix.rotation.x,
+                #     transform_matrix.rotation.y,
+                #     transform_matrix.rotation.z,
+                #     transform_matrix.rotation.w))
                 
-                self.tf = msg
+            self.tf = msg
                 
         elif isinstance(msg, TransformStamped):
             # Handle TransformStamped
-            translation = msg.transform.translation
-            rotation = msg.transform.rotation
+            # translation = msg.transform.translation
+            # rotation = msg.transform.rotation
             # Print transform data for demonstration
-            print("Received TransformStamped message:")
-            print("Translation: [x={}, y={}, z={}]".format(
-                translation.x, translation.y, translation.z))
-            print("Rotation: [x={}, y={}, z={}, w={}]".format(
-                rotation.x, rotation.y, rotation.z, rotation.w))
+            # print("Received TransformStamped message:")
+            # print("Translation: [x={}, y={}, z={}]".format(
+            #     translation.x, translation.y, translation.z))
+            # print("Rotation: [x={}, y={}, z={}, w={}]".format(
+            #     rotation.x, rotation.y, rotation.z, rotation.w))
             
             self.tf_stamped = msg
             
         elif isinstance(msg, Odometry):
-            position = msg.pose.pose.position
+            position = [msg.pose.pose.position.x, msg.pose.pose.position.y, msg.pose.pose.position.z]
             orientation = msg.pose.pose.orientation
-            linear_velocities = msg.twist.twist.linear
-            angular_velocities = msg.twist.twist.angular
+            linear_velocities = [msg.twist.twist.linear.x, msg.twist.twist.linear.y, msg.twist.twist.linear.z]
+            angular_velocities = [msg.twist.twist.angular.x, msg.twist.twist.angular.y, msg.twist.twist.angular.z]
 
             print(f"""
             ####### ODOMETRY INFORMATION ##########
@@ -90,8 +90,7 @@ class MySubscriber(Node):
             self.crazyflie.control.observation_space = None
 
 
-def main(args=None):
-    rclpy.init(args=args)
+def main():
     my_subscriber = MySubscriber()
     rclpy.spin(my_subscriber)
     my_subscriber.destroy_node()
