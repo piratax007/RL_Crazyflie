@@ -1,3 +1,4 @@
+import numpy as np
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import TransformStamped
@@ -32,6 +33,10 @@ class MySubscriber(Node):
         self.tf = None
         self.tf_stamped = None  # position
         self.odom = None  # linear and angular velocities
+        self.position = ()
+        self.euler_angles = ()
+        self.linear_velocities = ()
+        self.angular_velocities = ()
         self.crazyflie = crazyflie
 
     def listener_callback(self, msg):
@@ -71,23 +76,54 @@ class MySubscriber(Node):
             self.tf_stamped = msg
             
         elif isinstance(msg, Odometry):
-            position = [msg.pose.pose.position.x, msg.pose.pose.position.y, msg.pose.pose.position.z]
-            orientation = msg.pose.pose.orientation
-            linear_velocities = [msg.twist.twist.linear.x, msg.twist.twist.linear.y, msg.twist.twist.linear.z]
-            angular_velocities = [msg.twist.twist.angular.x, msg.twist.twist.angular.y, msg.twist.twist.angular.z]
+            self.position = (msg.pose.pose.position.x, msg.pose.pose.position.y, msg.pose.pose.position.z)
+            quaternion = msg.pose.pose.orientation
+            self.euler_angles = tuple(quaternion_to_euler_angles(quaternion))
+            self.linear_velocities = (msg.twist.twist.linear.x, msg.twist.twist.linear.y, msg.twist.twist.linear.z)
+            self.angular_velocities = (msg.twist.twist.angular.x, msg.twist.twist.angular.y, msg.twist.twist.angular.z)
 
             print(f"""
             ####### ODOMETRY INFORMATION ##########
-            POSITION {position}
-            ORIENTATATION {orientation}
-            VELOCITY {linear_velocities}
-            ANGULAR VELOCITY {angular_velocities}
+            POSITION {self.position}
+            ---------------------------------------
+            QUATERNION {quaternion}
+            ROLL, PITCH, YAW = {self.euler_angles}
+            ---------------------------------------
+            VELOCITY {self.linear_velocities}
+            ANGULAR VELOCITY {self.angular_velocities}
             """)
 
             self.odom = msg
             
         if self.tf is not None and self.odom is not None and self.tf_stamped is not None:
-            self.crazyflie.control.observation_space = None
+            self.crazyflie.control.observation_space = np.hstack(
+                (
+                    self.position,
+                    self.euler_angles,
+                    self.linear_velocities,
+                    self.angular_velocities
+                )
+            )
+
+
+def quaternion_to_euler_angles(q: list):
+    x, y, z, w = q
+
+    sinr_cosp = 2 * (w * x + y * z)
+    cosr_cosp = 1 - 2 * (x**2 + y**2)
+    roll = np.arctan2(sinr_cosp, cosr_cosp)
+
+    sinp = 2 * (w * y - z * x)
+    if np.abs(sinp) >= 1:
+        pitch = np.sign(sinp) * np.pi / 2
+    else:
+        pitch = np.arcsin(sinp)
+
+    siny_cosp = 2 * (w * z + x * y)
+    cosy_cosp = 1 - 2 * (y**2 + z**2)
+    yaw = np.arctan2(siny_cosp, cosy_cosp)
+
+    return roll, pitch, yaw
 
 
 def main():
