@@ -38,8 +38,6 @@ class ODOMETRYSubscriber(Node):
             1
         )
 
-        self.tf = None
-        self.tf_stamped = None  # position
         self.odom = None  # linear and angular velocities
         self.position = ()
         self.euler_angles = ()
@@ -47,7 +45,7 @@ class ODOMETRYSubscriber(Node):
         self.angular_velocities = ()
         self.crazyflie = crazyflie
         self.start_ref = (0, 0, 0)
-        self.start = 0
+        self.start = False
 
     def odometry_callback(self, msg):
         self.position = (
@@ -68,7 +66,7 @@ class ODOMETRYSubscriber(Node):
                 self.angular_velocities
             )
         )])
-        if self.start == 1:
+        if self.start:
             actions = self.crazyflie.control.applicable_pwm()
             # print(f"""
             #         Observarions: {crazyflie.control.observation_space}
@@ -85,7 +83,7 @@ class ODOMETRYSubscriber(Node):
             ref_y = self.position[1]
             ref_z = self.position[2]
             self.start_ref = (ref_x, ref_y, ref_z)
-            self.start = 1
+            self.start = True
 
     def stop_callback(self, msg):
         if self.start:
