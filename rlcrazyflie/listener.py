@@ -8,6 +8,7 @@ from rlcrazyflie.CrazyflieAPI import crazyflie
 TOPIC_ODOMETRY = "/vicon/fausto_crazyfly/fausto_crazyfly/odom"
 TOPIC_START_ENGINES = "/startfly"
 TOPIC_STOP_ENGINES = "/stopfly"
+TOPIC_LANDING = "/landing"
 
 
 class ODOMETRYSubscriber(Node):
@@ -28,6 +29,12 @@ class ODOMETRYSubscriber(Node):
             String,
             TOPIC_STOP_ENGINES,
             self.stop_callback,
+            1
+        )
+        self.subscription4 = self.create_subscription(
+            String,
+            TOPIC_LANDING,
+            self.landing_callback,
             1
         )
 
@@ -85,6 +92,11 @@ class ODOMETRYSubscriber(Node):
             self.start = False
             fly((0, 0, 0, 0))
             crazyflie.drone.setParam("motorPowerSet.enable", 0)
+
+    def landing_callback(self, msg):
+        crazyflie.drone.land(targetHeight=0.04, duration=2.5)
+        crazyflie.drone.setParam("motorPowerSet.enable", 0)
+        self.start = False
 
 
 def fly(actions: tuple):
