@@ -10,24 +10,24 @@ TOPIC_START_ENGINES = "/startfly"
 TOPIC_STOP_ENGINES = "/stopfly"
 
 
-class MySubscriber(Node):
+class ODOMETRYSubscriber(Node):
     def __init__(self):
         super().__init__('listener')
         self.subscription1 = self.create_subscription(
             Odometry,
             TOPIC_ODOMETRY,  # Change 'topic3' to the name of the third topic you want to subscribe to
-            self.listener_callback,
+            self.odometry_callback,
             10)
         self.subscription2 = self.create_subscription(
             String,
             TOPIC_START_ENGINES,
-            self.listener_startcv,
+            self.start_callback,
             1
         )
         self.subscription3 = self.create_subscription(
             String,
             TOPIC_STOP_ENGINES,
-            self.listener_stopcv,
+            self.stop_callback,
             1
         )
 
@@ -42,7 +42,7 @@ class MySubscriber(Node):
         self.start_ref = (0, 0, 0)
         self.start = 0
 
-    def listener_callback(self, msg):
+    def odometry_callback(self, msg):
         self.position = (
             msg.pose.pose.position.x - self.start_ref[0],
             msg.pose.pose.position.y - self.start_ref[1],
@@ -72,17 +72,17 @@ class MySubscriber(Node):
                     """)
             fly(actions)
 
-    def listener_startcv(self, msg):
-        if self.start == 0:
+    def start_callback(self, msg):
+        if not self.start:
             ref_x = self.position[0]
             ref_y = self.position[1]
             ref_z = self.position[2]
             self.start_ref = (ref_x, ref_y, ref_z)
             self.start = 1
 
-    def listener_stopcv(self, msg):
-        if self.start == 1:
-            self.start = 0
+    def stop_callback(self, msg):
+        if self.start:
+            self.start = False
             fly((0, 0, 0, 0))
             crazyflie.drone.setParam("motorPowerSet.enable", 0)
 
@@ -116,9 +116,9 @@ def quaternion_to_euler_angles(q: tuple):
 
 def main():
     crazyflie.drone.setParam("motorPowerSet.enable", 1)
-    my_subscriber = MySubscriber()
-    rclpy.spin(my_subscriber)
-    my_subscriber.destroy_node()
+    vicon_subscriber = ODOMETRYSubscriber()
+    rclpy.spin(vicon_subscriber)
+    vicon_subscriber.destroy_node()
     rclpy.shutdown()
 
 
