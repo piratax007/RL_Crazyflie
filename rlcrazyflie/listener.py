@@ -16,7 +16,7 @@ class ODOMETRYSubscriber(Node):
         super().__init__('listener')
         self.subscription1 = self.create_subscription(
             Odometry,
-            TOPIC_ODOMETRY,  # Change 'topic3' to the name of the third topic you want to subscribe to
+            TOPIC_ODOMETRY,
             self.odometry_callback,
             10)
         self.subscription2 = self.create_subscription(
@@ -38,7 +38,7 @@ class ODOMETRYSubscriber(Node):
             1
         )
 
-        self.odom = None  # linear and angular velocities
+        self.odom = None
         self.position = ()
         self.euler_angles = ()
         self.linear_velocities = ()
@@ -53,8 +53,13 @@ class ODOMETRYSubscriber(Node):
             msg.pose.pose.position.y - self.start_ref[1],
             msg.pose.pose.position.z - self.start_ref[2]
         )
-        quaternion = (msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w)
-        self.euler_angles = quaternion_to_euler_angles(quaternion)
+        quaternion = (
+            msg.pose.pose.orientation.x,
+            msg.pose.pose.orientation.y,
+            msg.pose.pose.orientation.z,
+            msg.pose.pose.orientation.w
+        )
+        self.euler_angles = euler_angles_from(quaternion)
         self.linear_velocities = (msg.twist.twist.linear.x, msg.twist.twist.linear.y, msg.twist.twist.linear.z)
         self.angular_velocities = (msg.twist.twist.angular.x, msg.twist.twist.angular.y, msg.twist.twist.angular.z)
 
@@ -68,13 +73,6 @@ class ODOMETRYSubscriber(Node):
         )])
         if self.start:
             actions = self.crazyflie.control.applicable_pwm()
-            # print(f"""
-            #         Observarions: {crazyflie.control.observation_space}
-            #         PWM Control: {actions}
-            #         """)
-            print(f"""
-                    PWM Control: {actions}
-                    """)
             fly(actions)
 
     def start_callback(self, msg):
@@ -104,7 +102,7 @@ def fly(actions: tuple):
     crazyflie.drone.setParam("motorPowerSet.m4", actions[3])
 
 
-def quaternion_to_euler_angles(q: tuple):
+def euler_angles_from(q: tuple):
     x, y, z, w = q
 
     sinr_cosp = 2 * (w * x + y * z)
