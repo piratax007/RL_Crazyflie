@@ -3,39 +3,47 @@ import rclpy
 from rclpy.node import Node
 from nav_msgs.msg import Odometry
 from std_msgs.msg import String
-from rlcrazyflie.CrazyflieAPI import crazyflie
+from geometry_msgs.msg import Quaternion
+from rlcrazyflie.CrazyflieAPI import CrazyflieAPI
 
 TOPIC_ODOMETRY = "/vicon/fausto_crazyfly/fausto_crazyfly/odom"
 TOPIC_START_ENGINES = "/startfly"
 TOPIC_STOP_ENGINES = "/stopfly"
 TOPIC_LANDING = "/landing"
+TOPIC_ACTIONS = "/actions"
+crazyflie = CrazyflieAPI()
 
 
-class ODOMETRYSubscriber(Node):
+class CrazyflieRLControl(Node):
     def __init__(self):
         super().__init__('listener')
-        self.subscription1 = self.create_subscription(
+        self.odometry_subscription = self.create_subscription(
             Odometry,
             TOPIC_ODOMETRY,
             self.odometry_callback,
             10)
-        self.subscription2 = self.create_subscription(
+        self.start_subscription = self.create_subscription(
             String,
             TOPIC_START_ENGINES,
             self.start_callback,
             1
         )
-        self.subscription3 = self.create_subscription(
+        self.stop_subscription = self.create_subscription(
             String,
             TOPIC_STOP_ENGINES,
             self.stop_callback,
             1
         )
-        self.subscription4 = self.create_subscription(
+        self.landing_subscription = self.create_subscription(
             String,
             TOPIC_LANDING,
             self.landing_callback,
             1
+        )
+        self.actions_publisher = self.create_publisher(
+            Quaternion,
+            TOPIC_ACTIONS,
+            10
         )
 
         self.odom = None
@@ -71,8 +79,16 @@ class ODOMETRYSubscriber(Node):
                 self.angular_velocities
             )
         )])
+
+        msg_actions = Quaternion()
+
         if self.start:
             actions = self.crazyflie.control.applicable_pwm()
+            msg_actions.x = actions[3]
+            msg_actions.y = actions[2]
+            msg_actions.z = actions[1]
+            msg_actions.w = actions[0]
+            self.actions_publisher.publish(msg_actions)
             fly(actions)
 
     def start_callback(self, msg):
@@ -124,7 +140,7 @@ def euler_angles_from(q: tuple):
 
 def main():
     crazyflie.drone.setParam("motorPowerSet.enable", 1)
-    vicon_subscriber = ODOMETRYSubscriber()
+    vicon_subscriber = CrazyflieRLControl()
     rclpy.spin(vicon_subscriber)
     vicon_subscriber.destroy_node()
     rclpy.shutdown()

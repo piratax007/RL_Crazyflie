@@ -25,9 +25,9 @@ $ source install/setup.zsh
     ```shell
     $ ros2 run ros1_bridge dynamic_bridge --bridge-all-topics
     ```
-4. Run the listener script - _terminal 3_
+4. Run the CrazyflieRLControl script - _terminal 3_
    ```shell
-   $ ros2 run rlcrazyflie listener
+   $ ros2 run rlcrazyflie CrazyflieRLControl
    ```
 5. Start the engines - _terminal 4_: It needs to run exactly once, use CTRL + C, to stop it.
    ```shell
