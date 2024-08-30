@@ -7,7 +7,7 @@ class RLControlForCrazyflie:
     def __init__(
             self,
             hover_rpm,
-            policy_path=os.path.dirname('/home/fausto/ros2_ws/src/rlcrazyflie/assets/'),
+            policy_path=os.path.dirname('/home/fausto/ros2_ws/src/crazyflierlcontrol/assets/best_model.zip'),
             initial_state=np.zeros((1, 12))
     ):
         self.policy = self._get_policy(policy_path)
