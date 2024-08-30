@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.spatial.transform import Rotation as R
 import rclpy
 from rclpy.node import Node
 from nav_msgs.msg import Odometry
@@ -55,8 +56,8 @@ class CrazyflieRLControl(Node):
         self.odom = None
         self.position = ()
         self.euler_angles = ()
-        self.linear_velocities = ()
-        self.angular_velocities = ()
+        self.linear_velocities = []
+        self.angular_velocities = []
         self.crazyflie = crazyflie
         self.start_ref = (0, 0, 0)
         self.start = False
@@ -73,9 +74,12 @@ class CrazyflieRLControl(Node):
             msg.pose.pose.orientation.z,
             msg.pose.pose.orientation.w
         )
+
+        linear_velocities_body_frame = [msg.twist.twist.linear.x, msg.twist.twist.linear.y, msg.twist.twist.linear.z]
+        angular_velocities_body_frame = [msg.twist.twist.angular.x, msg.twist.twist.angular.y, msg.twist.twist.angular.z]
+
         self.euler_angles = euler_angles_from(quaternion)
-        self.linear_velocities = (msg.twist.twist.linear.x, msg.twist.twist.linear.y, msg.twist.twist.linear.z)
-        self.angular_velocities = (msg.twist.twist.angular.x, msg.twist.twist.angular.y, msg.twist.twist.angular.z)
+        self.linear_velocities, self.angular_velocities = velocities_in_global_frame(list(quaternion), linear_velocities_body_frame, angular_velocities_body_frame)
 
         self.crazyflie.control.observation_space = np.array([np.hstack(
             (
@@ -156,6 +160,15 @@ def euler_angles_from(q: tuple):
     yaw = np.arctan2(siny_cosp, cosy_cosp)
 
     return roll, pitch, yaw
+
+
+def velocities_in_global_frame(quaternion: list, linear_velocities_body: list, angular_velocities_body: list):
+    r = R.from_quat(quaternion)
+
+    linear_velocity_global = r.apply(linear_velocities_body)
+    angular_velocity_global = r.apply(angular_velocities_body)
+
+    return linear_velocity_global, angular_velocity_global
 
 
 def main():
