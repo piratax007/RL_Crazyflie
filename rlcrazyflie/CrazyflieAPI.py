@@ -6,8 +6,8 @@ from rlcrazyflie.control import RLControlForCrazyflie
 class CrazyflieAPI:
     def __init__(self, drone_id=0):
         self.drone = self._get_drone(drone_id)
-        self.GRAVITY = 9.8
-        self.CRAZYFLIE_MASS = 0.032
+        self.GRAVITY = 9.812
+        self.CRAZYFLIE_MASS = 0.033
         self.CRAZYFLIE_TRHUST_COEFFICIENT = 3.16e-10
         self.HOVER_RPM = np.sqrt((self.GRAVITY*self.CRAZYFLIE_MASS) / (4 * self.CRAZYFLIE_TRHUST_COEFFICIENT))
         self.INITIAL_STATE = np.zeros((1, 12))
