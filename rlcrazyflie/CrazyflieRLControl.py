@@ -23,7 +23,8 @@ class CrazyflieRLControl(Node):
             Odometry,
             TOPIC_ODOMETRY,
             self.odometry_callback,
-            10)
+            10
+        )
         self.start_subscription = self.create_subscription(
             String,
             TOPIC_START_ENGINES,
@@ -68,6 +69,7 @@ class CrazyflieRLControl(Node):
             msg.pose.pose.position.y - self.start_ref[1],
             msg.pose.pose.position.z - self.start_ref[2]
         )
+
         quaternion = (
             msg.pose.pose.orientation.x,
             msg.pose.pose.orientation.y,
@@ -91,13 +93,14 @@ class CrazyflieRLControl(Node):
         )])
 
         msg_actions = Quaternion()
+        msg_observations = Odometry()
 
         if self.start:
             actions = self.crazyflie.control.applicable_pwm()
-            msg_actions.x = actions[3]
-            msg_actions.y = actions[2]
-            msg_actions.z = actions[1]
-            msg_actions.w = actions[0]
+            msg_actions.x = 0.2685 * actions[0] + 4070.3
+            msg_actions.y = 0.2685 * actions[1] + 4070.3
+            msg_actions.z = 0.2685 * actions[2] + 4070.3
+            msg_actions.w = 0.2685 * actions[3] + 4070.3
             self.actions_publisher.publish(msg_actions)
             fly(actions)
             msg_observations.pose.pose.position.x = self.position[0]
