@@ -11,6 +11,7 @@ TOPIC_START_ENGINES = "/startfly"
 TOPIC_STOP_ENGINES = "/stopfly"
 TOPIC_LANDING = "/landing"
 TOPIC_ACTIONS = "/actions"
+TOPIC_OBSERVATIONS = "/observations"
 crazyflie = CrazyflieAPI()
 
 
@@ -43,6 +44,11 @@ class CrazyflieRLControl(Node):
         self.actions_publisher = self.create_publisher(
             Quaternion,
             TOPIC_ACTIONS,
+            10
+        )
+        self.observations_publisher = self.create_publisher(
+            Odometry,
+            TOPIC_OBSERVATIONS,
             10
         )
 
@@ -90,6 +96,20 @@ class CrazyflieRLControl(Node):
             msg_actions.w = actions[0]
             self.actions_publisher.publish(msg_actions)
             fly(actions)
+            msg_observations.pose.pose.position.x = self.position[0]
+            msg_observations.pose.pose.position.y = self.position[1]
+            msg_observations.pose.pose.position.z = self.position[2]
+            msg_observations.pose.pose.orientation.x = self.euler_angles[0]
+            msg_observations.pose.pose.orientation.y = self.euler_angles[1]
+            msg_observations.pose.pose.orientation.z = self.euler_angles[2]
+            msg_observations.pose.pose.orientation.w = 0.0
+            msg_observations.twist.twist.linear.x = self.linear_velocities[0]
+            msg_observations.twist.twist.linear.y = self.linear_velocities[1]
+            msg_observations.twist.twist.linear.z = self.linear_velocities[2]
+            msg_observations.twist.twist.angular.x = self.angular_velocities[0]
+            msg_observations.twist.twist.angular.y = self.angular_velocities[1]
+            msg_observations.twist.twist.angular.z = self.angular_velocities[2]
+            self.observations_publisher.publish(msg_observations)
 
     def start_callback(self, msg):
         if not self.start:
