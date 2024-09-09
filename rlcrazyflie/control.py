@@ -25,7 +25,7 @@ class RLControlForCrazyflie:
 
     def applicable_pwm(self):
         self._denormalize_actions()
-        return tuple(map(lambda rpm: (rpm-4070.3)/(0.2685*0.999), self.calculated_rpm[0, :]))
+        return tuple(map(lambda rpm: ((5.17e-17*rpm*rpm*rpm*rpm-6.66e-12*rpm*rpm*rpm+2.99e-7*rpm*rpm-1.51e-4*rpm+2.22e-1)*65535) / 100, self.calculated_rpm[0, :]))
 
     @staticmethod
     def _get_policy(policy_path: str):
