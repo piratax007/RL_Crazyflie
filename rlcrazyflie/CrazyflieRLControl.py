@@ -81,9 +81,6 @@ class CrazyflieRLControl(Node):
         angular_velocities_body_frame = [msg.twist.twist.angular.x, msg.twist.twist.angular.y, msg.twist.twist.angular.z]
 
         self.euler_angles = euler_angles_from(quaternion)
-        # self.euler_angles = quat2eul(quaternion[0], quaternion[1], quaternion[2], quaternion[3])
-        # self.euler_angles = transforms3d.euler.mat2euler(transforms3d.quaternions.quat2mat([quaternion[3], quaternion[0], quaternion[1], quaternion[2]]))
-        # print(f"############ EULER ANGLES {self.euler_angles} TYPE {type(self.euler_angles)} #####################")
         self.linear_velocities, self.angular_velocities = velocities_in_global_frame(list(quaternion), linear_velocities_body_frame, angular_velocities_body_frame)
 
         self.crazyflie.control.observation_space = np.array([np.hstack(
